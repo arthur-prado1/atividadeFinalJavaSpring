@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Auditoria</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-dark bg-primary mb-4">
+    <div class="container d-flex justify-content-between">
+        <a class="navbar-brand" href="/produtos">FATEC Catalogo</a>
+        <a class="btn btn-light btn-sm" th:href="@{/produtos}">Voltar para listagem</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="card shadow">
+        <div class="card-header bg-white">
+            <h2 class="mb-0">Painel de Auditoria de Produtos</h2>
+
+        </div>
+        <div class="card-body">
+            <table class="table table-bordered table-hover align-middle">
+                <thead class="table-dark">
+                <tr>
+                    <th>ID Produto</th>
+                    <th>Produto</th>
+                    <th>Acao</th>
+                    <th>Usuario</th>
+                    <th>Estoque</th>
+                    <th>Data/Hora</th>
+                    <th>Detalhes</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="log : ${produtos}" th:classappend="${log.quantidade != null and log.quantidade < 5} ? 'table-warning' : ''">
+                    <td th:text="${log.idProduto}"></td>
+                    <td th:text="${log.nomeProduto}"></td>
+                    <td>
+                        <span class="badge bg-success" th:if="${log.acao == 'CREATE'}">CREATE</span>
+                        <span class="badge bg-primary" th:if="${log.acao == 'UPDATE'}">UPDATE</span>
+                        <span class="badge bg-danger" th:if="${log.acao == 'DELETE'}">DELETE</span>
+                    </td>
+                    <td th:text="${log.usuarioAcao != null ? log.usuarioAcao : '-'}"></td>
+                    <td>
+                        <span th:text="${log.quantidade != null ? log.quantidade : '-'}"></span>
+                        <span class="badge bg-danger ms-2" th:if="${log.quantidade != null and log.quantidade < 5}">Estoque baixo</span>
+                    </td>
+                    <td th:text="${log.dataEvento != null ? #temporals.format(log.dataEvento, 'dd/MM/yyyy HH:mm:ss') : '-'}"></td>
+                    <td>
+                        <a class="btn btn-sm btn-outline-secondary"
+                           th:href="@{/produtos/historico/detalhe/{id}(id=${log.idAuditoria})}">Visualizar detalhes</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div th:if="${#lists.isEmpty(produtos)}" class="alert alert-info text-center mb-0">
+                Nenhum registro de auditoria encontrado.
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
